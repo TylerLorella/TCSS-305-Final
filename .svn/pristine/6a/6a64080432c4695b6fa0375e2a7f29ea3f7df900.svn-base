@@ -1,0 +1,36 @@
+package model;
+
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
+
+public class RectangleTool extends AbstractTool implements Tool {
+
+    @Override
+    public Shape buildShape() {
+
+        double startX = getStartPoint().getX();
+
+        double startY = getStartPoint().getY();
+
+        double width = getEndPoint().getX() - getStartPoint().getX();
+
+        double height = getEndPoint().getY() - getStartPoint().getY();
+
+        if (getEndPoint().getX() < getStartPoint().getX()) {
+            startX = getEndPoint().getX();
+            width = getStartPoint().getX() - getEndPoint().getX();
+        }
+
+        if (getEndPoint().getY() < getStartPoint().getY()) {
+            startY = getEndPoint().getY();
+            height = getStartPoint().getY() - getEndPoint().getY();
+        }
+
+        return new Rectangle2D.Double(startX, startY, width, height);
+    }
+    
+    @Override
+    public String toString() {
+        return "Rectangle Tool";
+    }
+}

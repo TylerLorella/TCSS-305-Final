@@ -1,0 +1,56 @@
+/*
+ * TCSS 305 - Winter 2019
+ * Assignment 5 - Paint Program
+ */
+package model;
+
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+
+/**
+ * Tool that can build an ellipse from the given start and end coordinates.
+ * 
+ * @author Tyler Lorella (tlorella@uw.edu)
+ * @version 1
+ *
+ */
+public class EllipseTool extends AbstractTool implements Tool {
+    
+    /**
+     * Builds an ellipse that goes from the start point to the end point, capable of drawing 
+     * the ellipse both forwards and backwards.
+     * 
+     * @return An ellipse Shape.
+     */
+    @Override
+    public Shape buildShape() {
+        double startX = getStartPoint().getX();
+
+        double startY = getStartPoint().getY();
+
+        double width = getEndPoint().getX() - getStartPoint().getX();
+
+        double height = getEndPoint().getY() - getStartPoint().getY();
+
+        if (getEndPoint().getX() < getStartPoint().getX()) {
+            startX = getEndPoint().getX();
+            width = getStartPoint().getX() - getEndPoint().getX();
+        }
+
+        if (getEndPoint().getY() < getStartPoint().getY()) {
+            startY = getEndPoint().getY();
+            height = getStartPoint().getY() - getEndPoint().getY();
+        }
+
+        return new Ellipse2D.Double(startX, startY, width, height);
+    }
+    
+    /**
+     * The String representation of this ellipse tool.
+     * @return String that is the name of this tool.
+     */
+    @Override
+    public String toString() {
+        return "Ellipse Tool";
+    }
+}

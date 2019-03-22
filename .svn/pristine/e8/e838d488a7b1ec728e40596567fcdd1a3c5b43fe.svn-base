@@ -1,0 +1,29 @@
+package model;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import view.DrawingPanel;
+
+public class ToolListener implements ActionListener {
+    
+    //defunct
+
+    private final Tool myTool;
+    
+    private final DrawingPanel myDrawingPanel;
+    
+    public ToolListener(final Tool theTool, final DrawingPanel thePanel) {
+        //not sure if abstractTool will work
+        //super();
+        myTool = theTool;
+        myDrawingPanel = thePanel;
+    }
+    
+    @Override
+    public void actionPerformed(final ActionEvent theEvent) {
+        myDrawingPanel.setTool(myTool);
+        
+    }
+
+}

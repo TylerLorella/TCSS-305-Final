@@ -1,0 +1,53 @@
+package model;
+
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+
+import view.DrawingPanel;
+
+/**
+ * A class for handling actions when the tool buttons are clicked.
+ * 
+ * @author Tyler Lorella (tlorela@uw.edu)
+ * @version 1
+ */
+public class ToolAction extends AbstractAction {
+    
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = -6538414919197399404L;
+    
+    /**
+     * The current tool being used by the program, when a tool is selected the object needs 
+     * to be passed down to the DrawingPanel.
+     */
+    private final Tool myTool;
+    
+    /**
+     * The drawing panel that myTool will be active for.
+     */
+    private final DrawingPanel myDrawingPanel;
+    
+    /**
+     * Constructor for the ToolAction, 
+     * 
+     * @param theTool
+     * @param theDrawingPanel
+     */
+    public ToolAction(final Tool theTool, final DrawingPanel theDrawingPanel) {
+        super(theTool.toString());
+        myTool = theTool;
+        myDrawingPanel = theDrawingPanel;
+        putValue(SELECTED_KEY, true);
+    }
+
+    @Override
+    public void actionPerformed(final ActionEvent theEvent) {
+        // TODO Auto-generated method stub
+        myDrawingPanel.setTool(myTool);
+    }
+    
+
+}

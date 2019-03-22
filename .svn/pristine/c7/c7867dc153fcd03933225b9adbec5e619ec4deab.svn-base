@@ -1,0 +1,95 @@
+/*
+ * TCSS 305 - Winter 2019
+ * Assignment 5 - Paint Program
+ */
+package model;
+
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Path2D;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A tool representation of a pencil, allows the user to draw a path of lines by constantly
+ * drawing small lines. This tool overrides some of the functionality from the AbstractTool
+ * parent class.
+ * 
+ * @author Tyler Lorella (tlorella@uw.edu)
+ * @version 1
+ */
+public class PencilTool extends AbstractTool implements Tool {
+
+    /**
+     * The current path(s) that this object represents.
+     */
+    private final Path2D.Double myPath = new Path2D.Double();
+
+    /**
+     * A record of the current path that myPath has drawn across, useful for preventing the
+     * thickness bug.
+     */
+    private final List<Point> myPointList = new ArrayList<Point>();
+
+
+    /**
+     * Clears the path(s).
+     */
+    @Override
+    public void clearShape() {
+        super.clearShape();
+        myPointList.clear();
+        myPath.reset();
+
+    }
+
+    /**
+     * Overrides the start point method so that we may begin creating a path at this point 
+     * instead.
+     * 
+     * @param thePoint The starting point for this path.
+     */
+    @Override
+    public void setStartPoint(final Point thePoint) {
+        super.setStartPoint(thePoint);
+        myPointList.add(thePoint);
+        myPath.moveTo(getStartPoint().getX(), getStartPoint().getY());
+    }
+
+    /**
+     * Overrides the end point method so that we may start drawing lines from every EndPoint.
+     * 
+     * @param thePoint The end point that we will draw a line from the start to the end point.
+     */
+    @Override
+    public void setEndPoint(final Point thePoint) {
+        super.setEndPoint(thePoint);
+        myPointList.add(thePoint);
+        myPath.lineTo(getEndPoint().getX(), getEndPoint().getY());
+    }
+
+    /**
+     * Returns a new object that is a copy of the entire myPath object's path. If this method
+     * simply returned a copy then it creates a thickness bug.
+     */
+    @Override
+    public Shape buildShape() {
+        final Path2D.Double fakePath = new Path2D.Double();
+        if (!myPointList.isEmpty()) {
+            fakePath.moveTo(myPointList.get(0).getX(), myPointList.get(0).getY());
+            for (final Point p: myPointList) {
+                fakePath.lineTo(p.getX(), p.getY());
+            }
+        }
+        fakePath.trimToSize();
+        return (Shape) fakePath.clone();
+    }
+
+    /**
+     * Name of this tool in the GUI.
+     */
+    @Override
+    public String toString() {
+        return "Pencil Tool";
+    }
+}

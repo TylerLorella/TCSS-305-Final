@@ -1,0 +1,46 @@
+package model;
+
+import java.awt.Point;
+import java.awt.Shape;
+
+public abstract class AbstractTool implements Tool{
+    
+    private static final Point NO_POINT = new Point(-50, -50);
+
+    private Point myStartPoint;
+    
+    private Point myEndPoint;
+    
+    public abstract Shape buildShape();
+    
+    @Override
+    public abstract String toString();
+    
+    public AbstractTool() {
+        myStartPoint = NO_POINT;
+        myEndPoint = NO_POINT;
+    }
+    
+    public void setStartPoint(final Point theOtherPoint) {
+        myStartPoint = theOtherPoint;
+    }
+    
+    //check to make sure this return works.
+    public Point getStartPoint() {
+        return (Point) myStartPoint.clone();
+    }
+    
+    public void setEndPoint(final Point theOtherPoint) {
+        myEndPoint = theOtherPoint;
+    }
+    
+    public Point getEndPoint() {
+        return (Point) myEndPoint.clone();
+    }
+    
+    public Shape clearShape() {
+        return null;
+    }
+    
+    
+}

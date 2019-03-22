@@ -1,0 +1,100 @@
+package view;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.swing.JPanel;
+import javax.swing.event.MouseInputAdapter;
+
+import model.Tool;
+
+
+public class DrawingPanel extends JPanel {
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 661748911042328747L;
+    
+    private Color myColor;
+    
+    private Tool myTool;
+    
+    private final Map<Shape, Color> myShapeList;
+    
+    public DrawingPanel() {
+        super();
+        setBackground(Color.WHITE);
+        myShapeList = new LinkedHashMap<Shape, Color>();
+        
+        final MouseInputAdapter mouseHandler = new MouseHandler();
+        addMouseListener(mouseHandler);
+        addMouseMotionListener(mouseHandler);
+    }
+    
+    public void setColor(final Color theColor) {
+        myColor = theColor;
+    }
+
+    public void setTool(Tool theTool) {
+        //not sure if abstractTool will work
+        myTool = theTool;
+    }
+    
+    public void clear() {
+        myShapeList.clear();
+        final Point deadPoint = new Point(0, 0);
+        myTool.setStartPoint(deadPoint);
+        myTool.setEndPoint(deadPoint);
+        repaint();
+    }
+    
+    @Override
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D graphics2D = (Graphics2D) theGraphics;
+        
+        if (!myShapeList.isEmpty()) {
+            
+        }
+        
+        for (final Shape aShape: myShapeList.keySet()) {
+            graphics2D.setStroke(new BasicStroke(2));
+            graphics2D.setColor(myShapeList.get(aShape));
+            graphics2D.draw(aShape);
+        }
+        //need to use basicStroke for setting the thickness, may want to create an object that stores the color, shape, and thickness of objects.
+        graphics2D.setStroke(new BasicStroke(2));
+        graphics2D.setColor(myColor);
+        graphics2D.draw(myTool.buildShape());
+        
+    }
+    
+    private class MouseHandler extends MouseInputAdapter {
+        
+        @Override
+        public void mousePressed(final MouseEvent theEvent) {
+            myTool.setStartPoint(theEvent.getPoint());
+            repaint();
+        }
+        
+        @Override
+        public void mouseDragged(final MouseEvent theEvent) {
+            myTool.setEndPoint(theEvent.getPoint());
+            repaint();
+        }
+        
+        @Override
+        public void mouseReleased(final MouseEvent theEvent) {
+            myShapeList.put(myTool.buildShape(), myColor);
+            
+        }
+    }
+}

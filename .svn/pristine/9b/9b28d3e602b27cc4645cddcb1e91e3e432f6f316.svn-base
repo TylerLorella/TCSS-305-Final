@@ -1,0 +1,256 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+
+import model.EllipseTool;
+import model.LineTool;
+import model.PencilTool;
+import model.RectangleTool;
+import model.Tool;
+import model.ToolAction;
+
+public class PaintGUI {
+    
+    private final static int SIZE_MODIFIER = 3;
+    
+    private final static int CENTER_MODIFIER = 2;
+    
+    private final static int SLIDER_MAX = 15;
+    
+    private final static int SLIDER_DEFAULT = 2;
+    
+    private final static int SLIDER_MIN = 0;
+    
+    private final static int SLIDER_TICK_MAJOR = 5;
+    
+    private final static int SLIDER_TICK_MINOR = 1;
+    
+    private final static ImageIcon ICON = new ImageIcon("./Tyler.jpg");
+    
+    private final JFrame myJFrame;
+    
+    private final DrawingPanel myDrawingPanel;
+    
+    private final LineTool myLineTool;
+    
+    private final RectangleTool myRectangleTool;
+    
+    private final EllipseTool myEllipseTool;
+    
+    private final PencilTool myPencilTool;
+    
+    private final Map<String, Tool> myToolMap;
+    
+    private Color myColor;
+
+    
+    public PaintGUI() {
+        myJFrame = new JFrame("TCSS 305 - Paint Program");
+        myDrawingPanel = new DrawingPanel();
+        myColor = new Color(51, 0, 111);
+        myLineTool = new LineTool();
+        myRectangleTool = new RectangleTool();
+        myEllipseTool = new EllipseTool();
+        myPencilTool = new PencilTool();
+        
+        myToolMap = new LinkedHashMap<String, Tool>();
+        myToolMap.put("Line Tool", myLineTool);
+        myToolMap.put("Pencil Tool", myPencilTool);
+        myToolMap.put("Rectangle Tool", myRectangleTool);
+        myToolMap.put("Ellipse Tool", myEllipseTool);
+    }
+    
+    
+    public void start() {
+        
+        buildMyJFrame();
+        
+        myJFrame.add(myDrawingPanel, BorderLayout.CENTER);
+        
+        final Map<String, ToolAction> listenerMap = new LinkedHashMap<String, ToolAction>();
+        for (String toolKey: myToolMap.keySet()) {
+            listenerMap.put(toolKey, new ToolAction(myToolMap.get(toolKey), myDrawingPanel));
+        }
+        
+        final JToolBar toolBar = buildToolBar(listenerMap);
+        myJFrame.add(toolBar, BorderLayout.SOUTH);
+        
+        myJFrame.setJMenuBar(buildMenuBar(listenerMap));
+        
+        myDrawingPanel.setColor(myColor);
+        myDrawingPanel.setTool(myLineTool);
+        myJFrame.add(myDrawingPanel);
+        
+  
+    }
+    
+    public void setClearEnabled(boolean isEnabled) {
+        
+    }
+    
+    private void buildMyJFrame() {
+        //Document https://stackoverflow.com/questions/3680221/how-can-i-get-screen-resolution-in-java
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        
+        final int width = (int) (screenSize.getWidth() / SIZE_MODIFIER);
+        final int height = (int) (screenSize.getHeight() / SIZE_MODIFIER);
+        
+        final int startX = (int) ((screenSize.getWidth() / CENTER_MODIFIER) 
+                        - (width / CENTER_MODIFIER));
+        final int startY = (int) ((screenSize.getHeight() / CENTER_MODIFIER) 
+                        - (height / CENTER_MODIFIER));
+        
+        myJFrame.setBounds(startX, startY, width, height);
+        //myJFrame.setBounds(10, 10, 100, 100);
+        myJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        myJFrame.setVisible(true);
+        myJFrame.setIconImage(ICON.getImage());
+    }
+    
+    private JMenuBar buildMenuBar(final Map<String, ToolAction> theListenerMap) {
+        final JMenuBar menuBar = new JMenuBar();
+        
+        menuBar.add(buildOptionMenu());
+        menuBar.add(buildToolMenu(theListenerMap));
+        menuBar.add(buildHelpMenu());
+        
+        return menuBar;
+    }
+    
+    private JMenu buildOptionMenu() {
+        final JMenu menu = new JMenu("Option");
+        final JMenu thickMenu = buildThickMenu();
+        
+        menu.add(thickMenu);
+        menu.addSeparator();
+        
+        //need to implement a color chooser action not a listener.
+        final JMenuItem colorItem = new JMenuItem("Color");
+        colorItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                final Color color = JColorChooser.showDialog(myJFrame, 
+                                                       "CHOOSE YOUR COLOR", myColor);
+                if (color != null) {
+                    myColor = color;
+                }
+            }
+            
+        });
+        menu.add(colorItem);
+        menu.addSeparator();
+        
+        final JMenuItem clearItem = new JMenuItem("Clear");
+        clearItem.setEnabled(false);
+        clearItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myDrawingPanel.clear();
+            }
+        });
+        menu.add(clearItem);
+        
+        return menu;
+    }
+    
+    private JMenu buildThickMenu() {
+        final JMenu menu = new JMenu("Thickness");
+        final JSlider slider = new JSlider(SwingConstants.HORIZONTAL, SLIDER_MIN, 
+                                           SLIDER_MAX, SLIDER_DEFAULT);
+        slider.setMajorTickSpacing(SLIDER_TICK_MAJOR);
+        slider.setMinorTickSpacing(SLIDER_TICK_MINOR);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        
+        menu.add(slider);
+        return menu;
+    }
+    
+    private JMenu buildToolMenu(final Map<String, ToolAction> theListenerMap) {
+        final JMenu menu = new JMenu("Tools");
+        final ButtonGroup buttonGroup = new ButtonGroup();
+        
+        
+        for (String toolMapKey: myToolMap.keySet()) {
+            final JRadioButtonMenuItem button = buildRadioButtonItem(toolMapKey, theListenerMap);
+            menu.add(button);
+            buttonGroup.add(button);
+        }
+        
+        return menu;
+    }
+    
+    private JMenu buildHelpMenu() {
+        final JMenu menu = new JMenu("Help");
+        final JMenuItem item = new JMenuItem("About");
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                JOptionPane.showMessageDialog(myJFrame, "Winter 2019 \n Tyler Lorella",
+                                              "TCSS 305 - Paint Program", 
+                                              JOptionPane.PLAIN_MESSAGE, ICON);
+            }
+        });
+        menu.add(item);
+        return menu;
+    }
+
+    private JToolBar buildToolBar(final Map<String, ToolAction> theListenerMap) {
+        final JToolBar toolBar = new JToolBar();
+        final ButtonGroup buttonGroup = new ButtonGroup();
+        
+        final JButton color = new JButton("Color...");
+        toolBar.add(color);
+        
+        
+        for (String toolMapKey: myToolMap.keySet()) {
+            final JToggleButton button = buildToggleButton(toolMapKey, theListenerMap);
+            toolBar.add(button);
+            buttonGroup.add(button);
+        }
+        
+        return toolBar;
+    }
+  
+    private JRadioButtonMenuItem buildRadioButtonItem(String theToolMapKey, final Map<String, ToolAction> theListenerMap) {
+        final JRadioButtonMenuItem button = new JRadioButtonMenuItem(theToolMapKey);
+        //button.addActionListener(theListenerMap.get(theToolMapKey)); //need to referance a defined listener object.
+        button.setAction(theListenerMap.get(theToolMapKey));
+        return button;
+    }
+    
+    
+    private JToggleButton buildToggleButton(String theToolMapKey, final Map<String, ToolAction> theListenerMap) {
+        final JToggleButton button = new JToggleButton(theToolMapKey);
+        //button.addActionListener(theListenerMap.get(theToolMapKey)); //need to referance a defined listener object.
+        button.setAction(theListenerMap.get(theToolMapKey));
+        return button;
+    }
+
+
+}

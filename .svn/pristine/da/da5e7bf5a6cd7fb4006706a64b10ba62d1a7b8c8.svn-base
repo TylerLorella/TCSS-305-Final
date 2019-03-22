@@ -1,0 +1,17 @@
+package model;
+
+import java.awt.Shape;
+import java.awt.geom.Line2D;
+
+public class LineTool extends AbstractTool implements Tool{
+
+    @Override
+    public Shape buildShape() {
+        return new Line2D.Double(getStartPoint(), getEndPoint());
+    }
+    
+    @Override
+    public String toString() {
+        return "Line Tool";
+    }
+}
